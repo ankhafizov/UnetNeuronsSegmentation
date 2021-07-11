@@ -1,0 +1,10 @@
+{   
+    "train": 0,
+    "sample_number":"111",
+    "target_feature":"detection",
+    "device":"laptop",
+    "input_tomo_images":"tomo_images",
+
+    "mask_images":"mask_images",
+    "output_masked_images":"mask_applied"
+}
