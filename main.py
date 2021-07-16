@@ -16,20 +16,21 @@ PYTHONPATH = "C:/Users/79690/anaconda3/python.exe"
 
 def train():
     scale=0.75 if json.load(open('configs.json'))["device"] == "server" else 0.5
-    os.system(f"{PYTHONPATH} c:/Users/79690/Desktop/repos/Pytorch-UNet/train.py -s {scale}")
+    os.system(f"{PYTHONPATH} c:/Users/79690/Desktop/repos/UnetNeuronsSegmentation/train.py -s {scale}")
     os.replace("checkpoints\CP_epoch5.pth", MODEL_NAME)
 
 
-def predict():
+def predict(beginning=0):
     if not os.path.isdir(MASK_IMAGES_FOLDER):
         os.makedirs(MASK_IMAGES_FOLDER)
 
     filenames = os.listdir(INPUT_TOMO_IMAGES_FOLDER)
-    for fn in tqdm(filenames, desc="predictions"):
-        input_name = os.path.join(INPUT_TOMO_IMAGES_FOLDER, fn)
-        output_name = os.path.join(MASK_IMAGES_FOLDER, fn)
-        os.system(f"{PYTHONPATH} c:/Users/79690/Desktop/repos/Pytorch-UNet/predict.py -i\
-                  {input_name} -o {output_name} -m {MODEL_NAME}")
+    for i, fn in enumerate(tqdm(filenames, desc="predictions")):
+        if i>=beginning:
+            input_name = os.path.join(INPUT_TOMO_IMAGES_FOLDER, fn)
+            output_name = os.path.join(MASK_IMAGES_FOLDER, fn)
+            os.system(f"{PYTHONPATH} c:/Users/79690/Desktop/repos/UnetNeuronsSegmentation/predict.py -i\
+                    {input_name} -o {output_name} -m {MODEL_NAME}")
 
 
 if __name__=="__main__":
@@ -37,6 +38,6 @@ if __name__=="__main__":
     if need_train:
         train()
 
-    predict()
+    predict(428)
     cleaner.process()
     mask_worker.apply_mask()
