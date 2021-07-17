@@ -17,7 +17,24 @@ OUTPUT_MASKED_IMAGES_FOLDER = os.path.join(ROOT_FOLDER,
 DEVICE = json.load(open('configs.json'))["device"]
 
 
-def vizualize_mask(axis = 1, mask_only=True):
+def vizualize_mask(section_number):
+    img = dm.get_tif_img2d(os.listdir(INPUT_TOMO_IMAGES_FOLDER)[section_number], INPUT_TOMO_IMAGES_FOLDER)
+    mask = dm.get_tif_img2d(os.listdir(MASK_IMAGES_FOLDER)[section_number], MASK_IMAGES_FOLDER)
+
+
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
+    ax.imshow(img, cmap="gray")
+    ax.contour(mask, colors="red")
+
+    if DEVICE=="server":
+        dm.save_fig(fig, "mask")
+    elif DEVICE=="laptop":
+        plt.show()
+
+    return fig
+
+
+def vizualize_mask_3d(axis = 1, mask_only=True):
     file_names = os.listdir(INPUT_TOMO_IMAGES_FOLDER)
     z_len = len(file_names)
     x_len, y_len = dm.get_tif_img2d(file_names[0], INPUT_TOMO_IMAGES_FOLDER).shape
@@ -65,7 +82,7 @@ def apply_mask(smooth=False):
 
 
 if __name__ == "__main__":
-    vizualize_mask()
+    vizualize_mask(1711)
     # m = _smooth_mask()
     # fig, ax = plt.subplots(figsize=(10, 10))
     # ax.imshow(m[500], cmap="gray")
