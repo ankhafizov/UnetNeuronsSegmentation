@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import data_manager as dm
 from scipy.signal import fftconvolve
 import numpy as np
+from skimage import exposure
+from scipy.ndimage import zoom
 
 import json
 import os
@@ -21,9 +23,8 @@ def vizualize_mask(section_number):
     img = dm.get_tif_img2d(os.listdir(INPUT_TOMO_IMAGES_FOLDER)[section_number], INPUT_TOMO_IMAGES_FOLDER)
     mask = dm.get_tif_img2d(os.listdir(MASK_IMAGES_FOLDER)[section_number], MASK_IMAGES_FOLDER)
 
-
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
-    ax.imshow(img, cmap="gray")
+    ax.imshow(exposure.equalize_adapthist(img), cmap="gray")
     ax.contour(mask, colors="red")
 
     if DEVICE=="server":
@@ -40,7 +41,10 @@ def vizualize_mask_3d(axis = 1, mask_only=True):
     x_len, y_len = dm.get_tif_img2d(file_names[0], INPUT_TOMO_IMAGES_FOLDER).shape
     indx = (z_len, x_len, y_len)[axis] // 2
 
-    mask_3d_section = dm.assemble_3d_img(MASK_IMAGES_FOLDER).take(indx, axis)
+    mask_3d= dm.assemble_3d_img(MASK_IMAGES_FOLDER)
+    mask_3d = zoom(mask_3d, 0.5)
+    mask_3d = zoom(mask_3d, 2)
+    mask_3d_section = mask_3d.take(indx, axis)
 
     if not mask_only:
         img_3d_section = dm.assemble_3d_img(INPUT_TOMO_IMAGES_FOLDER).take(indx, axis)
@@ -82,8 +86,8 @@ def apply_mask(smooth=False):
 
 
 if __name__ == "__main__":
-    vizualize_mask(1711)
-    # m = _smooth_mask()
+    # vizualize_mask(992)
+    vizualize_mask_3d(mask_only=False)    # m = _smooth_mask()
     # fig, ax = plt.subplots(figsize=(10, 10))
     # ax.imshow(m[500], cmap="gray")
     # plt.show()
