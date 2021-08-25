@@ -1,3 +1,7 @@
+import json
+import os
+from tqdm import tqdm
+
 import matplotlib.pyplot as plt
 import data_manager as dm
 from scipy.signal import fftconvolve
@@ -5,23 +9,20 @@ import numpy as np
 from skimage import exposure
 from scipy.ndimage import zoom
 
-import json
-import os
-from tqdm import tqdm
+import config_helper
 
-ROOT_FOLDER = json.load(open('configs.json'))["target_feature"] + "_" + \
-              json.load(open('configs.json'))["sample_number"] + "_data"
-INPUT_TOMO_IMAGES_FOLDER = json.load(open('configs.json'))["input_tomo_images"]
-MASK_IMAGES_FOLDER = os.path.join(ROOT_FOLDER,
-                                  json.load(open('configs.json'))["mask_images"])
-OUTPUT_MASKED_IMAGES_FOLDER = os.path.join(ROOT_FOLDER,
-                                           json.load(open('configs.json'))["output_masked_images"])
-DEVICE = json.load(open('configs.json'))["device"]
+
+INPUT_TOMO_IMAGES_FOLDER = config_helper.get_input_tomo_img_folder()
+MASK_IMAGES_FOLDER = config_helper.get_mask_img_folder()
+OUTPUT_MASKED_IMAGES_FOLDER = config_helper.get_OUTPUT_mask_img_folder()
+DEVICE = config_helper.get_device()
 
 
 def vizualize_mask(section_number):
-    img = dm.get_tif_img2d(os.listdir(INPUT_TOMO_IMAGES_FOLDER)[section_number], INPUT_TOMO_IMAGES_FOLDER)
-    mask = dm.get_tif_img2d(os.listdir(MASK_IMAGES_FOLDER)[section_number], MASK_IMAGES_FOLDER)
+    img = dm.get_tif_img2d(os.listdir(INPUT_TOMO_IMAGES_FOLDER)[section_number],
+                           INPUT_TOMO_IMAGES_FOLDER)
+    mask = dm.get_tif_img2d(os.listdir(MASK_IMAGES_FOLDER)[section_number],
+                            MASK_IMAGES_FOLDER)
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
     ax.imshow(exposure.equalize_adapthist(img), cmap="gray")
@@ -79,7 +80,8 @@ def apply_mask(smooth=False):
         mask_sections = dm.load_all_data(MASK_IMAGES_FOLDER)
     img_sections = dm.load_all_data(INPUT_TOMO_IMAGES_FOLDER)
 
-    for img_data, mask_data in tqdm(zip(img_sections, mask_sections), total=filecount, desc="applying masks"):
+    for img_data, mask_data in tqdm(zip(img_sections, mask_sections), 
+                                    total=filecount, desc="applying masks"):
         img, fn = img_data 
         mask = mask_data if smooth else mask_data[0]
         dm.save_tif(img*mask, fn, OUTPUT_MASKED_IMAGES_FOLDER)

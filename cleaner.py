@@ -1,18 +1,17 @@
+import os
+from tqdm import tqdm
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.ndimage import label as label_image
 from scipy.ndimage.morphology import binary_fill_holes
 
 import data_manager as dm
+import config_helper
 
-import json, os
-from tqdm import tqdm
 
-ROOT_FOLDER = json.load(open('configs.json'))["target_feature"] + "_" + \
-              json.load(open('configs.json'))["sample_number"] + "_data"
-INPUT_TOMO_IMAGES_FOLDER = json.load(open('configs.json'))["input_tomo_images"]
-MASK_IMAGES_FOLDER = os.path.join(ROOT_FOLDER,
-                                  json.load(open('configs.json'))["mask_images"])
+INPUT_TOMO_IMAGES_FOLDER = config_helper.get_input_tomo_img_folder()
+MASK_IMAGES_FOLDER = config_helper.get_mask_img_folder()
 
 
 def remove_small_elements(bin_img):

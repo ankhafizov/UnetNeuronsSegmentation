@@ -1,0 +1,10 @@
+train: False
+sample_number: 111 # id-шник для разных образцов мозгов
+target_feature: "detection"
+device: "server"
+input_tomo_images: "tomo_images"
+mask_images: "mask_images"
+output_masked_images: "mask_applied"
+
+
+ROOT_FOLDER: $target_feature # + "_" + sample_number + "_data"

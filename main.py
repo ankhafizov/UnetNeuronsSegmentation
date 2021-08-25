@@ -1,22 +1,24 @@
-import os, json
+import os
 from tqdm import tqdm
 
 import cleaner, mask_worker
 
+import config_helper
 
-ROOT_FOLDER = json.load(open('configs.json'))["target_feature"] + "_" + \
-              json.load(open('configs.json'))["sample_number"] + "_data"
-INPUT_TOMO_IMAGES_FOLDER = json.load(open('configs.json'))["input_tomo_images"]
-MASK_IMAGES_FOLDER = os.path.join(ROOT_FOLDER,
-                                  json.load(open('configs.json'))["mask_images"])
 
-MODEL_NAME = "MODEL_" + json.load(open('configs.json'))["target_feature"] + ".pth"
-PYTHONPATH = "C:/Users/79690/anaconda3/python.exe"
+INPUT_TOMO_IMAGES_FOLDER = config_helper.get_input_tomo_img_folder()
+MASK_IMAGES_FOLDER = config_helper.get_mask_img_folder()
+
+MODEL_NAME = config_helper.get_model_name()
+
+DEVICE = config_helper.get_device()
+NEED_TRAIN = config_helper.does_need_train()
+PYTHONPATH = "py"
 
 
 def train():
-    scale=0.75 if json.load(open('configs.json'))["device"] == "server" else 0.5
-    os.system(f"{PYTHONPATH} c:/Users/79690/Desktop/repos/UnetNeuronsSegmentation/train.py -s {scale}")
+    scale=0.75 if DEVICE == "server" else 0.5
+    os.system(f"{PYTHONPATH} train.py -s {scale}")
     os.replace("checkpoints\CP_epoch5.pth", MODEL_NAME)
 
 
@@ -29,13 +31,12 @@ def predict(beginning=0):
         if i>=beginning:
             input_name = os.path.join(INPUT_TOMO_IMAGES_FOLDER, fn)
             output_name = os.path.join(MASK_IMAGES_FOLDER, fn)
-            os.system(f"{PYTHONPATH} c:/Users/79690/Desktop/repos/UnetNeuronsSegmentation/predict.py -i\
+            os.system(f"{PYTHONPATH} predict.py -i\
                     {input_name} -o {output_name} -m {MODEL_NAME}")
 
 
 if __name__=="__main__":
-    need_train = bool(json.load(open('configs.json'))["train"])
-    if need_train:
+    if NEED_TRAIN:
         train()
 
     predict(428)
