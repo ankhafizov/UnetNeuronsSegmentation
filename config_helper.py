@@ -22,7 +22,7 @@ def get_mask_img_folder(config_file_name="config.yaml"):
     return os.path.join(root, config["mask_images"])
 
 
-def get_OUTPUT_mask_img_folder(config_file_name="config.yaml"):
+def get_OUTPUT_masked_img_folder(config_file_name="config.yaml"):
     config = open_config(config_file_name=config_file_name)
     root = get_root_img_folder(config_file_name=config_file_name)
     return os.path.join(root, config["output_masked_images"])

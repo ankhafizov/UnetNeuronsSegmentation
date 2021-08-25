@@ -14,7 +14,7 @@ import config_helper
 
 INPUT_TOMO_IMAGES_FOLDER = config_helper.get_input_tomo_img_folder()
 MASK_IMAGES_FOLDER = config_helper.get_mask_img_folder()
-OUTPUT_MASKED_IMAGES_FOLDER = config_helper.get_OUTPUT_mask_img_folder()
+OUTPUT_MASKED_IMAGES_FOLDER = config_helper.get_OUTPUT_masked_img_folder()
 DEVICE = config_helper.get_device()
 
 
