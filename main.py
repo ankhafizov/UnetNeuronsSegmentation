@@ -12,8 +12,7 @@ MASK_IMAGES_FOLDER = config_helper.get_mask_img_folder()
 MODEL_NAME = config_helper.get_model_name()
 
 DEVICE = config_helper.get_device()
-NEED_TRAIN = config_helper.does_need_train()
-PYTHONPATH = "py"
+PYTHONPATH = "python"
 
 
 def train():
@@ -36,9 +35,10 @@ def predict(beginning=0):
 
 
 if __name__=="__main__":
-    if NEED_TRAIN:
+    if config_helper.does_need_train():
         train()
-
-    predict(428)
-    cleaner.process()
+    if config_helper.does_need_predict():
+        predict(config_helper.get_start_prediction_point())
+    if config_helper.does_need_cleaning():
+        cleaner.process()
     mask_worker.apply_mask()

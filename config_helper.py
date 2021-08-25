@@ -3,12 +3,13 @@ import os
 
 def open_config(config_file_name="config.yaml"):
     with open(config_file_name, 'r') as config:
-        print(yaml.safe_load(config))
+        return yaml.safe_load(config)
 
 
 def get_root_img_folder(config_file_name="config.yaml"):
     config = open_config(config_file_name=config_file_name)
-    return config["target_feature"] + "_" + config["sample_number"] + "_data"
+    return config["target_feature"] + "_"\
+           + str(config["sample_number"]) + "_data"
 
 
 def get_input_tomo_img_folder(config_file_name="config.yaml"):
@@ -33,11 +34,30 @@ def get_model_name(config_file_name="config.yaml"):
     return "MODEL_" + config["target_feature"] + ".pth"
 
 
-def get_device(config_file_name):
+def get_device(config_file_name="config.yaml"):
     config = open_config(config_file_name=config_file_name)
     return config["device"]
 
 
-def does_need_train(config_file_name):
+def get_start_prediction_point(config_file_name="config.yaml"):
+    config = open_config(config_file_name=config_file_name)
+    point = config["start_predictions"]
+    point = 0 if point == "beginning" else point
+
+    assert type(point) == int
+    return point
+
+
+def does_need_train(config_file_name="config.yaml"):
     config = open_config(config_file_name=config_file_name)
     return config["train"]
+
+
+def does_need_predict(config_file_name="config.yaml"):
+    config = open_config(config_file_name=config_file_name)
+    return config["predict"]
+
+
+def does_need_cleaning(config_file_name="config.yaml"):
+    config = open_config(config_file_name=config_file_name)
+    return config["cleaning"]

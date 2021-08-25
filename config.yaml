@@ -1,7 +1,12 @@
 train: False  # тренировать модель или нет
-sample_number: 111  # id-шник для разных образцов мозгов
-target_feature: "detection"  # detection - обнаружение объекта, butterfly - обнаружение бабочки. Должен совпадать с названием модели (пример: MODEL_batterfly.pth)
+
+predict: True # нужно ли делать предикты нейронкой
+start_predictions: "beginig" # или с определенного номера томо сечения
+sample_number: 123438  # id-шник для разных образцов мозгов
+target_feature: "butterfly"  # detection - обнаружение объекта, butterfly - обнаружение бабочки. Должен совпадать с названием модели (пример: MODEL_batterfly.pth)
 device: "server"  # server или laptop. Если laptop, то будут использоваться настройки для облегчения вычислений (скейлинг картинок)
-input_tomo_images: "tomo_images"  # путь к папке с экспериментальными изображениями
-mask_images: "mask_images"  # куда нейронка будет выгружать полученные маски
+input_tomo_images: "/home/ankhafizov/Desktop/Reconstructions/gecko"  # путь к папке с экспериментальными изображениями
+mask_images: "mask_binary_images"  # куда нейронка будет выгружать полученные маски
 output_masked_images: "mask_applied"  # где хранить отмаскированные томо изображения
+
+cleaning: True # нужно ли "заливать дырки" и удалять прочие артефакты в бинарных масках, полученных нейронкой
