@@ -16,7 +16,7 @@ PYTHONPATH = "python"
 
 
 def train():
-    scale=0.75 if DEVICE == "server" else 0.5
+    scale = config_helper.open_config()["scale_img"]
     os.system(f"{PYTHONPATH} train.py -s {scale}")
     os.replace("checkpoints\CP_epoch5.pth", MODEL_NAME)
 
