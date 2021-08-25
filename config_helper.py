@@ -44,7 +44,6 @@ def get_start_prediction_point(config_file_name="config.yaml"):
     point = config["start_predictions"]
     point = 0 if point == "beginning" else point
 
-    assert type(point) == int
     return point
 
 
