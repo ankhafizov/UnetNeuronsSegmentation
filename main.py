@@ -1,7 +1,7 @@
 import os
-from tqdm import tqdm
 
 import cleaner, mask_worker
+from tqdm import tqdm
 
 import config_helper
 
