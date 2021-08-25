@@ -7,6 +7,8 @@ import torch
 import torch.nn.functional as F
 from PIL import Image
 from torchvision import transforms
+import warnings
+warnings.simplefilter(action='ignore')
 
 from unet import UNet
 from utils.data_vis import plot_img_and_mask
