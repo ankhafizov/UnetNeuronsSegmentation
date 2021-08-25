@@ -19,6 +19,9 @@ DEVICE = config_helper.get_device()
 
 
 def vizualize_mask(section_number):
+    """
+    Показать изображение томо-сечения и наложить на него маску
+    """
     img = dm.get_tif_img2d(os.listdir(INPUT_TOMO_IMAGES_FOLDER)[section_number],
                            INPUT_TOMO_IMAGES_FOLDER)
     mask = dm.get_tif_img2d(os.listdir(MASK_IMAGES_FOLDER)[section_number],
@@ -37,6 +40,10 @@ def vizualize_mask(section_number):
 
 
 def vizualize_mask_3d(axis = 1, mask_only=True):
+    """
+    Показать изображение сечения по любой из осей декартовых координат.
+    Можно наложит маску контуром, а можно просто вывести сечения.
+    """
     file_names = os.listdir(INPUT_TOMO_IMAGES_FOLDER)
     z_len = len(file_names)
     x_len, y_len = dm.get_tif_img2d(file_names[0], INPUT_TOMO_IMAGES_FOLDER).shape
@@ -73,6 +80,9 @@ def _smooth_mask():
 
 
 def apply_mask(smooth=False):
+    """
+    Отмаскировать все томо изображения по маскам, полученным нейронкой.
+    """
     filecount = len(os.listdir(MASK_IMAGES_FOLDER))
     if smooth:
         mask_sections = dm.assemble_3d_img(MASK_IMAGES_FOLDER)
