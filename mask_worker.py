@@ -72,13 +72,6 @@ def vizualize_mask_3d(axis = 1, mask_only=True):
     return fig
 
 
-def _smooth_mask():
-    mask_3d_section = dm.assemble_3d_img(MASK_IMAGES_FOLDER).astype(np.uint8)
-    selem = np.full((3, 3, 3), 1)
-    filt_mask = fftconvolve(mask_3d_section, selem)
-    return filt_mask > 0.5
-
-
 def apply_mask(smooth=False):
     """
     Отмаскировать все томо изображения по маскам, полученным нейронкой.
