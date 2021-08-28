@@ -39,7 +39,7 @@ def segment_neurons(img_metadata, z_range,
         if z_range[0] <= i < z_range[1]:
             image_3d.append(img2d)
             tomo_section_filenames.append(tomo_section_filename)
-        elif i < z_range[0]:
+        elif i > z_range[1]:
             break
 
     image_3d = np.array(image_3d)
@@ -62,3 +62,6 @@ def segment_neurons(img_metadata, z_range,
     save_folder = config_helper.get_RandomWalker_mask_img_folder()
     for img_2d_bin, shot_name in tqdm(zip(image_3d, tomo_section_filenames)):
         dm.save_tif(img_2d_bin, shot_name, save_folder)
+    
+    global count
+    count = 0
