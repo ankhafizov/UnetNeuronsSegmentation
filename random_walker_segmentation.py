@@ -32,7 +32,8 @@ def binarize_img(im, thrs1, thrs2, max_iter):
 
 
 def segment_neurons(mask_folder_name, z_range,
-                    thrs1 = 0.000266, thrs2 = -1.54e-05):
+                    thrs1 = 0.000266, thrs2 = -1.54e-05,
+                    boundary_mask_folder = None):
 
     image_3d, tomo_section_filenames =  dm.assemble_3d_img_stack(mask_folder_name,
                                                                  z_range)
@@ -55,8 +56,16 @@ def segment_neurons(mask_folder_name, z_range,
     image_3d = normalize(image_3d).astype(np.int8)
 
     save_folder = config_helper.get_RandomWalker_mask_img_folder()
-    for img_2d_bin, shot_name in tqdm(zip(image_3d, tomo_section_filenames)):
-        dm.save_tif(img_2d_bin, shot_name, save_folder)
+
+    if not boundary_mask_folder:
+        for img_2d_bin, shot_name in tqdm(zip(image_3d, tomo_section_filenames)):
+            dm.save_tif(img_2d_bin, shot_name, save_folder)
+    else:
+        bound_mask_3d, _ =  dm.assemble_3d_img_stack(boundary_mask_folder,
+                                                z_range)
+        for img_2d_bin, shot_name in tqdm(zip(image_3d, tomo_section_filenames)):
+            img_2d_bin = np.logical_and(img_2d_bin, bound_mask_3d)
+            dm.save_tif(img_2d_bin , shot_name, save_folder)
     
     global count
     count = 0

@@ -12,8 +12,9 @@ mask_images: "mask_binary_images"  # куда нейронка будет выг
 output_masked_images: "mask_applied"  # где хранить отмаскированные томо изображения
 
 cleaning: False  # нужно ли "заливать дырки" и удалять прочие артефакты в бинарных масках, полученных нейронкой
-apply_masks: False
+apply_masks: False  # наложить маски на исходные томо-изображения
 
-segment_neurons: True
-RandomWalker_mask_folder: "neurons_binary_mask"
-z_ranges: [[0, 550], [550, 1_100], [1_100, 1_650], [1_650, 2120]]
+segment_neurons: True  # запустить рандомволкер
+RandomWalker_mask_folder: "neurons_binary_mask"  # куда сохранять бинарные маски рандомволкера
+z_ranges: [[0, 550], [550, 1_100], [1_100, 1_650], [1_650, 2120]]  # как декомпозировать вычисления для оптимизации
+apply_boundary_mask: True  # наложить маску "бабочки" на сегментерование рандомволкера, чтобы оно не выходило за края 

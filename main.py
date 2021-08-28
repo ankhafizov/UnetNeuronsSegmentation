@@ -48,7 +48,12 @@ if __name__=="__main__":
         mask_worker.apply_mask()
     if config_helper.open_config()["segment_neurons"]:
         z_ranges = config_helper.open_config()["z_ranges"]
+        if config_helper.open_config()["apply_boundary_mask"]:
+            boundary_mask_folder = MASK_IMAGES_FOLDER
+        else:
+            boundary_mask_folder = None
 
         for z_range in z_ranges:
             rws.segment_neurons(MASKED_IMAGES_FOLDER, z_range,
-                                thrs1 = 0.000266, thrs2 = -1.54e-05)
+                                thrs1 = 0.000266, thrs2 = -1.54e-05,
+                                boundary_mask_folder = boundary_mask_folder)
