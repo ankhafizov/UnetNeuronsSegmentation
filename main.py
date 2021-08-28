@@ -37,6 +37,9 @@ def predict(beginning=0):
                     {input_name} -o {output_name} -m {MODEL_NAME}")
 
 
+
+
+
 if __name__=="__main__":
     if config_helper.does_need_train():
         train()
@@ -48,6 +51,8 @@ if __name__=="__main__":
         mask_worker.apply_mask()
     if config_helper.open_config()["segment_neurons"]:
         img_metadata = dm.load_all_data(MASKED_IMAGES_FOLDER)
-        z_max = config_helper.open_config()["z_max"]
-        rws.segment_neurons(img_metadata, z_max,
-                            thrs1 = 0.000266, thrs2 = -1.54e-05)
+        z_ranges = config_helper.open_config()["z_ranges"]
+
+        for z_range in z_ranges:        
+            rws.segment_neurons(img_metadata, z_range,
+                                thrs1 = 0.000266, thrs2 = -1.54e-05)

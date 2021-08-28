@@ -16,4 +16,4 @@ apply_masks: False
 
 segment_neurons: True
 RandomWalker_mask_folder: "neurons_binary_mask"
-z_max: 500
+z_ranges: [[0, 550], [550, 1_100], [1_100, 1_650], [1_650, 2120]]
