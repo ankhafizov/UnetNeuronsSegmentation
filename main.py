@@ -45,7 +45,7 @@ if __name__=="__main__":
     if config_helper.does_need_cleaning():
         cleaner.process()
     if config_helper.open_config()["apply_masks"]:
-        mask_worker.apply_mask()
+        mask_worker.apply_mask_CNN()
     if config_helper.open_config()["segment_neurons"]:
         z_ranges = config_helper.open_config()["z_ranges"]
         if config_helper.open_config()["apply_boundary_mask"]:
