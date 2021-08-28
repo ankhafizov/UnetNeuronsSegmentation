@@ -31,16 +31,11 @@ def binarize_img(im, thrs1, thrs2, max_iter):
     return (t<2).astype(int)
 
 
-def segment_neurons(img_metadata, z_range,
+def segment_neurons(mask_folder_name, z_range,
                     thrs1 = 0.000266, thrs2 = -1.54e-05):
 
-    image_3d, tomo_section_filenames = [], []
-    for i, (img2d, tomo_section_filename) in enumerate(img_metadata):
-        if z_range[0] <= i < z_range[1]:
-            image_3d.append(img2d)
-            tomo_section_filenames.append(tomo_section_filename)
-        elif i > z_range[1]:
-            break
+    image_3d, tomo_section_filenames =  dm.assemble_3d_img_stack(mask_folder_name,
+                                                                 z_range)
 
     image_3d = np.array(image_3d)
     image_3d = median(image_3d, selem=ball(1))
