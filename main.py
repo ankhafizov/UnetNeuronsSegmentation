@@ -48,6 +48,6 @@ if __name__=="__main__":
         mask_worker.apply_mask()
     if config_helper.open_config()["segment_neurons"]:
         img_metadata = dm.load_all_data(MASKED_IMAGES_FOLDER)
-        z_max = 50
+        z_max = config_helper.open_config()["z_max"]
         rws.segment_neurons(img_metadata, z_max,
                             thrs1 = 0.000266, thrs2 = -1.54e-05)
