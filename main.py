@@ -4,10 +4,13 @@ import cleaner, mask_worker
 from tqdm import tqdm
 
 import config_helper
+import data_manager as dm
+import random_walker_segmentation as rws
 
 
 INPUT_TOMO_IMAGES_FOLDER = config_helper.get_input_tomo_img_folder()
 MASK_IMAGES_FOLDER = config_helper.get_mask_img_folder()
+MASKED_IMAGES_FOLDER = config_helper.get_OUTPUT_masked_img_folder()
 
 MODEL_NAME = config_helper.get_model_name()
 
@@ -41,4 +44,10 @@ if __name__=="__main__":
         predict(config_helper.get_start_prediction_point())
     if config_helper.does_need_cleaning():
         cleaner.process()
-    mask_worker.apply_mask()
+    if config_helper.open_config()["apply_masks"]:
+        mask_worker.apply_mask()
+    if config_helper.open_config()["segment_neurons"]:
+        img_metadata = dm.load_all_data(MASKED_IMAGES_FOLDER)
+        z_max = 50
+        rws.segment_neurons(img_metadata, z_max,
+                            thrs1 = 0.000266, thrs2 = -1.54e-05)

@@ -5,13 +5,11 @@ from porespy.filters import chunked_func
 from skimage.filters import median
 from skimage.morphology import ball
 import time
-import os
 
 import data_manager as dm
 import config_helper
 
 
-NUM_OF_TIF_SLICES = 500
 count = 0
 
 
@@ -22,7 +20,7 @@ def binarize_img(im, thrs1, thrs2, max_iter):
     markers = np.zeros_like(im)
     markers[im > thrs1] = 1
     markers[im < thrs2] = 2
-    if len(np.unique(markers)) < 2:
+    if len(np.unique(markers)) < 3:
         return np.zeros_like(im)
     print("markers: ", np.unique(markers), "sum: ", np.sum(im - im.min()))
     t = random_walker(im, markers, beta=100)
@@ -34,18 +32,26 @@ def binarize_img(im, thrs1, thrs2, max_iter):
     return (t<2).astype(int)
 
 
-def segment_neurons(image_3d, z_range, thrs1 = 0.000266, thrs2 = -1.54e-05):
+def segment_neurons(img_metadata, z_max,
+                    thrs1 = 0.000266, thrs2 = -1.54e-05):
 
-    start_time = time.time()
-    image_3d = image_3d[z_range[0]:z_range[1]]
-    shot_names = [dm.generate_tif_tomo_section_name(n) for n in range(*z_range)]
-    print(np.sum(image_3d))
+    image_3d, tomo_section_filenames = [], []
+    for i, (img2d, tomo_section_filename) in enumerate(img_metadata):
+        print(tomo_section_filename)
+        if i<z_max:
+            image_3d.append(img2d)
+            tomo_section_filenames.append(tomo_section_filename)
+        else:
+            break
+    image_3d = np.array(image_3d)
 
-    print(image_3d.shape)
+    init_shape = image_3d.shape
+    print(init_shape)
 
     image_3d = median(image_3d, selem=ball(1))
 
-    divs = np.array(image_3d.shape) // np.array([20, 40, 40])
+    calc_volume_shape = [20, 40, 40]
+    divs = np.array(image_3d.shape) // np.array(calc_volume_shape)
     image_3d = chunked_func(func=binarize_img,
                             im=image_3d,
                             thrs1=thrs1,
@@ -55,11 +61,9 @@ def segment_neurons(image_3d, z_range, thrs1 = 0.000266, thrs2 = -1.54e-05):
                             overlap=(3, 5, 5),
                             cores=2)
 
-    save_folder = config_helper.get_root_img_folder()
-    save_folder = os.path.join(save_folder, "neurons_binary_mask")
-    for img2d, shot_name in tqdm(zip(image_3d, shot_names)):
-        print(np.sum(img2d))
-        dm.save_tif(img2d, shot_name, save_folder)
+    normalize = lambda x: (x - x.min()) / (x.max() - x.min())
+    image_3d = normalize(image_3d).astype(np.int8)
 
-    end_time = time.time()
-    print("cumulative time (min): ", (end_time-start_time)/60)
+    save_folder = config_helper.get_RandomWalker_mask_img_folder()
+    for img_2d_bin, shot_name in tqdm(zip(image_3d, tomo_section_filenames)):
+        dm.save_tif(img_2d_bin, shot_name, save_folder)
