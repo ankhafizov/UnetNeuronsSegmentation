@@ -13,4 +13,6 @@ output_masked_images: "mask_applied"  # где хранить отмаскиро
 
 cleaning: False  # нужно ли "заливать дырки" и удалять прочие артефакты в бинарных масках, полученных нейронкой
 apply_masks: False
+
 segment_neurons: True
+RandomWalker_mask_folder: "neurons_binary_mask"
