@@ -43,6 +43,22 @@ def assemble_3d_img(folder_name):
     return np.array(img3d)
 
 
+def assemble_3d_img_stack(folder_name, z_range):
+    data = load_all_data(folder_name)
+    img3d, file_names = [], []
+
+    for i, (img2d, fn) in enumerate(data):
+        if z_range[0] <= i < z_range[1]:
+            img3d.append(img2d)
+            file_names.append(fn)
+        elif i >= z_range[1]:
+            break
+        else:
+            continue
+
+    return np.array(img3d), file_names
+
+
 def save_fig(figure, name):
     save_path = os.path.join(SCRIPT_PATH, 'plots')
     if not os.path.isdir(save_path):
