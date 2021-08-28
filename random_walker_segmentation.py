@@ -39,7 +39,7 @@ def segment_neurons(img_metadata, z_range,
         if z_range[0] <= i < z_range[1]:
             image_3d.append(img2d)
             tomo_section_filenames.append(tomo_section_filename)
-        elif i <= z_range[1]:
+        elif i < z_range[0]:
             break
 
     image_3d = np.array(image_3d)
