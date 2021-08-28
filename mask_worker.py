@@ -1,13 +1,9 @@
-import json
 import os
 from tqdm import tqdm
 
 import matplotlib.pyplot as plt
 import data_manager as dm
-from scipy.signal import fftconvolve
-import numpy as np
 from skimage import exposure
-from scipy.ndimage import zoom
 
 import config_helper
 
@@ -18,14 +14,18 @@ OUTPUT_MASKED_IMAGES_FOLDER = config_helper.get_OUTPUT_masked_img_folder()
 DEVICE = config_helper.get_device()
 
 
-def vizualize_mask(section_number):
+def _get_section_img(folder, section_number):
+    list_dir = sorted(os.listdir(folder))
+    return dm.get_tif_img2d(list_dir[section_number], folder)
+
+
+def vizualize_mask_CNN(section_number):
     """
-    Показать изображение томо-сечения и наложить на него маску
+    Показать изображение томо-сечения и наложить на него маску полученную CNN
+    после обработки с параметрами из конфигов.
     """
-    img = dm.get_tif_img2d(os.listdir(INPUT_TOMO_IMAGES_FOLDER)[section_number],
-                           INPUT_TOMO_IMAGES_FOLDER)
-    mask = dm.get_tif_img2d(os.listdir(MASK_IMAGES_FOLDER)[section_number],
-                            MASK_IMAGES_FOLDER)
+    img = _get_section_img(INPUT_TOMO_IMAGES_FOLDER, section_number)
+    mask = _get_section_img(MASK_IMAGES_FOLDER, section_number)
 
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
     ax.imshow(exposure.equalize_adapthist(img), cmap="gray")
@@ -39,7 +39,7 @@ def vizualize_mask(section_number):
     return fig
 
 
-def vizualize_mask_3d(axis = 1, mask_only=True):
+def vizualize_mask_3d_CNN(axis = 1, mask_only=True):
     """
     Показать изображение сечения по любой из осей декартовых координат.
     Можно наложит маску контуром, а можно просто вывести сечения.
@@ -50,8 +50,6 @@ def vizualize_mask_3d(axis = 1, mask_only=True):
     indx = (z_len, x_len, y_len)[axis] // 2
 
     mask_3d= dm.assemble_3d_img(MASK_IMAGES_FOLDER)
-    mask_3d = zoom(mask_3d, 0.5)
-    mask_3d = zoom(mask_3d, 2)
     mask_3d_section = mask_3d.take(indx, axis)
 
     if not mask_only:
@@ -72,7 +70,7 @@ def vizualize_mask_3d(axis = 1, mask_only=True):
     return fig
 
 
-def apply_mask(smooth=False):
+def apply_mask_CNN(smooth=False):
     """
     Отмаскировать все томо изображения по маскам, полученным нейронкой.
     """
@@ -90,9 +88,29 @@ def apply_mask(smooth=False):
         dm.save_tif(img*mask, fn, OUTPUT_MASKED_IMAGES_FOLDER)
 
 
+def vizualize_mask_RandomWalker(section_number):
+    tomo_img = _get_section_img(OUTPUT_MASKED_IMAGES_FOLDER, section_number)
+
+    rw_mask_folder = config_helper.get_RandomWalker_mask_img_folder()
+    mask = _get_section_img(rw_mask_folder, section_number)
+
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 10))
+    axes[0].imshow(exposure.equalize_adapthist(tomo_img), cmap="gray")
+    axes[1].imshow(exposure.equalize_adapthist(tomo_img), cmap="gray")
+    axes[1].contour(mask, colors="red")
+
+    if DEVICE=="server":
+        dm.save_fig(fig, "mask_RW")
+    elif DEVICE=="laptop":
+        plt.show()
+
+    return fig
+
+
 if __name__ == "__main__":
-    # vizualize_mask(992)
-    vizualize_mask_3d(mask_only=False)    # m = _smooth_mask()
+    vizualize_mask_CNN(0)
+    vizualize_mask_RandomWalker(0)
+    # vizualize_mask_3d(mask_only=False)    # m = _smooth_mask()
     # fig, ax = plt.subplots(figsize=(10, 10))
     # ax.imshow(m[500], cmap="gray")
     # plt.show()
