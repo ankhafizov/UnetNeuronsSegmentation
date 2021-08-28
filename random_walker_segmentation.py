@@ -31,7 +31,7 @@ def binarize_img(im, thrs1, thrs2, max_iter):
     return (t<2).astype(int)
 
 
-def segment_neurons(mask_folder_name, z_range,
+def segment_small_features(mask_folder_name, z_range,
                     thrs1 = 0.000266, thrs2 = -1.54e-05,
                     boundary_mask_folder = None):
 
