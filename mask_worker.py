@@ -94,9 +94,12 @@ def vizualize_mask_RandomWalker(section_number):
     rw_mask_folder = config_helper.get_RandomWalker_mask_img_folder()
     mask = _get_section_img(rw_mask_folder, section_number)
 
-    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10, 10))
-    axes[0].imshow(exposure.equalize_adapthist(tomo_img), cmap="gray")
-    axes[1].imshow(exposure.equalize_adapthist(tomo_img), cmap="gray")
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(20, 20))
+
+    tomo_img = exposure.equalize_adapthist(tomo_img,
+                                           clip_limit=0.02)
+    axes[0].imshow(tomo_img, cmap="gray")
+    axes[1].imshow(tomo_img, cmap="gray")
     axes[1].contour(mask, colors="red")
 
     if DEVICE=="server":
@@ -108,8 +111,9 @@ def vizualize_mask_RandomWalker(section_number):
 
 
 if __name__ == "__main__":
-    vizualize_mask_CNN(0)
-    vizualize_mask_RandomWalker(0)
+    section_number = 400
+    vizualize_mask_CNN(section_number)
+    vizualize_mask_RandomWalker(section_number)
     # vizualize_mask_3d(mask_only=False)    # m = _smooth_mask()
     # fig, ax = plt.subplots(figsize=(10, 10))
     # ax.imshow(m[500], cmap="gray")
