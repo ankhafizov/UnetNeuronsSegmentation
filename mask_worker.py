@@ -102,12 +102,12 @@ def vizualize_mask_RandomWalker(section_number, separate_small_and_big=True):
     if separate_small_and_big:
         try:
             big_mask = _get_section_img(rw_mask_folder + "_big", section_number)
-            axes[1].contour(big_mask, colors="red")
+            axes[1].contour(big_mask, colors="yellow")
         except FileNotFoundError:
             pass
         try:
             small_mask = _get_section_img(rw_mask_folder + "_small", section_number)
-            axes[1].contour(small_mask, colors="yellow")
+            axes[1].contour(small_mask, colors="red")
         except FileNotFoundError:
             pass
     else:
