@@ -14,6 +14,9 @@ count = 0
 
 
 def binarize_img(im, thrs1, thrs2, max_iter):
+    global count
+    count += 1
+
     if not np.sum(im - im.min())>0:
         return np.zeros_like(im)
     start_time = time.time()
@@ -22,13 +25,9 @@ def binarize_img(im, thrs1, thrs2, max_iter):
     markers[im < thrs2] = 2
     if len(np.unique(markers)) < 3:
         return np.zeros_like(im)
-    print("markers: ", np.unique(markers), "sum: ", np.sum(im - im.min()))
     t = random_walker(im, markers, beta=100)
-    global count
     print("count", count, " of ", max_iter, f" %: {count/max_iter:.2f}" ,"| time (min): ", (time.time() - start_time) / 60)
-    count += 1
-    
-    print("return sum: ", np.sum((t<2).astype(int)))
+
     return (t<2).astype(int)
 
 
@@ -37,8 +36,7 @@ def segment_neurons(img_metadata, z_max,
 
     image_3d, tomo_section_filenames = [], []
     for i, (img2d, tomo_section_filename) in enumerate(img_metadata):
-        print(tomo_section_filename)
-        if i<z_max:
+        if i < z_max:
             image_3d.append(img2d)
             tomo_section_filenames.append(tomo_section_filename)
         else:
@@ -46,7 +44,6 @@ def segment_neurons(img_metadata, z_max,
     image_3d = np.array(image_3d)
 
     init_shape = image_3d.shape
-    print(init_shape)
 
     image_3d = median(image_3d, selem=ball(1))
 
