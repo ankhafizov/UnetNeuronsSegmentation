@@ -88,11 +88,10 @@ def apply_mask_CNN(smooth=False):
         dm.save_tif(img*mask, fn, OUTPUT_MASKED_IMAGES_FOLDER)
 
 
-def vizualize_mask_RandomWalker(section_number):
+def vizualize_mask_RandomWalker(section_number, separate_small_and_big=True):
     tomo_img = _get_section_img(OUTPUT_MASKED_IMAGES_FOLDER, section_number)
 
     rw_mask_folder = config_helper.get_RandomWalker_mask_img_folder()
-    mask = _get_section_img(rw_mask_folder, section_number)
 
     fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(20, 20))
 
@@ -100,7 +99,14 @@ def vizualize_mask_RandomWalker(section_number):
                                            clip_limit=0.02)
     axes[0].imshow(tomo_img, cmap="gray")
     axes[1].imshow(tomo_img, cmap="gray")
-    axes[1].contour(mask, colors="red")
+    if separate_small_and_big:
+        big_mask = _get_section_img(rw_mask_folder + "_big", section_number)
+        axes[1].contour(big_mask, colors="red", label="big")
+        small_mask = _get_section_img(rw_mask_folder + "_small", section_number)
+        axes[1].contour(small_mask, colors="yellow", label="small")
+    else:
+        mask = _get_section_img(rw_mask_folder, section_number)
+        axes[1].contour(mask, colors="red")
 
     if DEVICE=="server":
         dm.save_fig(fig, "mask_RW")
@@ -111,7 +117,7 @@ def vizualize_mask_RandomWalker(section_number):
 
 
 if __name__ == "__main__":
-    section_number = 400
+    section_number = 100
     vizualize_mask_CNN(section_number)
     vizualize_mask_RandomWalker(section_number)
     # vizualize_mask_3d(mask_only=False)    # m = _smooth_mask()
