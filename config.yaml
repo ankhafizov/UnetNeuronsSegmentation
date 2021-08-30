@@ -15,7 +15,7 @@ cleaning: False  # нужно ли "заливать дырки" и удалят
 apply_masks: False  # наложить маски на исходные томо-изображения
 
 segment_small_features: True  # запустить рандомволкер, small_features - нейроны, сосуды и т.д.
-RandomWalker_mask_folder: "small_features_binary_mask"  # куда сохранять бинарные маски рандомволкера
+RandomWalker_mask_folder: "neurons_binary_mask"  # куда сохранять бинарные маски рандомволкера
 z_ranges: [[0, 550], [550, 1_100], [1_100, 1_650], [1_650, 2120]]  # как декомпозировать вычисления для оптимизации
 apply_boundary_mask: True  # наложить маску "бабочки" на сегментерование рандомволкера, чтобы оно не выходило за края
 separate_small_features: True # разделить фичи рандомволкера на крупные и малые
