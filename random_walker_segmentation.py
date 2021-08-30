@@ -59,7 +59,6 @@ def segment_small_features(mask_folder_name, z_range,
 
     normalize = lambda x: (x - x.min()) / (x.max() - x.min())
     image_3d = normalize(image_3d).astype(np.int8)
-    print(image_3d.shape)
 
     save_folder = config_helper.get_RandomWalker_mask_img_folder()
 
@@ -69,8 +68,9 @@ def segment_small_features(mask_folder_name, z_range,
     else:
         bound_mask_3d, _ =  dm.assemble_3d_img_stack(boundary_mask_folder,
                                                      z_range)
-        for img_2d_bin, shot_name in tqdm(zip(image_3d, tomo_section_filenames)):
-            img_2d_bin = img_2d_bin * bound_mask_3d
+        for img_2d_bin, bmask, shot_name in tqdm(zip(image_3d, bound_mask_3d,
+                                                     tomo_section_filenames)):
+            img_2d_bin = img_2d_bin * bmask
             dm.save_tif(img_2d_bin , shot_name, save_folder)
     
     global count
