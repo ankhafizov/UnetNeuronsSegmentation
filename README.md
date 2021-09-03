@@ -1,115 +1,68 @@
-# UNet: semantic segmentation with PyTorch
+# UNET сегментация для обработки томографических изображений
 
-[![xscode](https://img.shields.io/badge/Available%20on-xs%3Acode-blue?style=?style=plastic&logo=appveyor&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAZQTFRF////////VXz1bAAAAAJ0Uk5T/wDltzBKAAAAlUlEQVR42uzXSwqAMAwE0Mn9L+3Ggtgkk35QwcnSJo9S+yGwM9DCooCbgn4YrJ4CIPUcQF7/XSBbx2TEz4sAZ2q1RAECBAiYBlCtvwN+KiYAlG7UDGj59MViT9hOwEqAhYCtAsUZvL6I6W8c2wcbd+LIWSCHSTeSAAECngN4xxIDSK9f4B9t377Wd7H5Nt7/Xz8eAgwAvesLRjYYPuUAAAAASUVORK5CYII=)](https://xscode.com/milesial/Pytorch-UNet)
+Код в данном репозитории представляет обертку для https://github.com/milesial/Pytorch-UNet с
+добавлением классических методов сегментаций (RandomWalker).
 
+Для применения данного ПО необходимо ввести входные параметры в файле config.yaml, а затем запустить main.py.
 
-![input and output for a random image in the test dataset](https://i.imgur.com/GD8FcB7.png)
+## Параметры config.yaml
 
+### Системные настройки:
 
-Customized implementation of the [U-Net](https://arxiv.org/abs/1505.04597) in PyTorch for Kaggle's [Carvana Image Masking Challenge](https://www.kaggle.com/c/carvana-image-masking-challenge) from high definition images.
+- *device: "server" или "laptop"* - если "server", то будут использоваться настройки для сохранения различных визуализаций
+внутри mask_worker.py. Если "laptop" - они не будут сохраняться, а будут моментально выводиться на экран;
 
-This model was trained from scratch with 5000 images (no data augmentation) and scored a [dice coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient) of 0.988423 (511 out of 735) on over 100k test images. This score could be improved with more training, data augmentation, fine tuning, playing with CRF post-processing, and applying more weights on the edges of the masks.
+### Тренировка:
 
-The Carvana data is available on the [Kaggle website](https://www.kaggle.com/c/carvana-image-masking-challenge/data).
+ВНИМАНИЕ: перед тренировкой необходимо распаковать архив из изображений (например отсюда https://drive.google.com/folderview?id=1bd5FmJdl_BTppeflqAdRFp4hMiWdmIgi). Должны быть папки imgs и masks. Файлы в этих масках должны иметь одинаковое название, но могут иметь разные расширения (например 1.tif - 1.png).
 
-## Usage
-**Note : Use Python 3.6 or newer**
-### Prediction
+- *train: False* или *False* - тренировать модель или нет. При запуске впервые, модель необходимо натренировать.
+Скрипт автоматически создаст файл весов для модели и поместит его в корень данного каталога. 
+При желании это также можно сделать самостоятельно вручную, назвав его по типу MODEL_<target_feature>.pth (что такое <target_feature> смотри ниже, по умолчанию target_feature: "butterfly", а значит название файла модели должно быть MODEL_butterfly.pth);
 
-After training your model and saving it to MODEL.pth, you can easily test the output masks on your images via the CLI.
+- *scale_img: от 0 до 1* - параметр скейлинга изображений перед запуском нейросети для ускорения. Как правило, но не всегда, 
+scale_img ближе к 1 приводит к увеличению качества сегментации.
 
-To predict a single image and save it:
+### Сегментация нейронкой:
 
-`python predict.py -i image.jpg -o output.jpg`
+- *predict: True или False* - нужно ли запустить процесс сегментации нейронкой;
 
-To predict a multiple images and show them without saving them:
+- *start_predictions: "beginning" или int число* - можно указать номер томографического сечения с которого начать инференс.
+Может пригодиться при сбое сервера или иных проблемах, когда часть изображений уже отсегментирована, а другая - еще нет;
 
-`python predict.py -i image1.jpg image2.jpg --viz --no-save`
+- *sample_number: int* - айди образца в произвольной форме. Например,если на синхротроне было измеренно несколько образцов,
+то каждый из них может иметь собственный номер. Этот номер можно учитывать в названии папки с отсегментированными изображениями,
+которая создастся автоматически;
 
-```shell script
-> python predict.py -h
-usage: predict.py [-h] [--model FILE] --input INPUT [INPUT ...]
-                  [--output INPUT [INPUT ...]] [--viz] [--no-save]
-                  [--mask-threshold MASK_THRESHOLD] [--scale SCALE]
+- *target_feature: str* - произволдьное описание объекта сегментации, например "бабочка", если идет сегментация бабочки спинного мозга.
+Этот параметр можно учитывать в названии папки с отсегментированными изображениями, которая создастся автоматически;
 
-Predict masks from input images
+- *input_tomo_images: path* - путь к папке где лежат реконструированные томо изображения, которые необходимо сегментировать;
 
-optional arguments:
-  -h, --help            show this help message and exit
-  --model FILE, -m FILE
-                        Specify the file in which the model is stored
-                        (default: MODEL.pth)
-  --input INPUT [INPUT ...], -i INPUT [INPUT ...]
-                        filenames of input images (default: None)
-  --output INPUT [INPUT ...], -o INPUT [INPUT ...]
-                        Filenames of ouput images (default: None)
-  --viz, -v             Visualize the images as they are processed (default:
-                        False)
-  --no-save, -n         Do not save the output masks (default: False)
-  --mask-threshold MASK_THRESHOLD, -t MASK_THRESHOLD
-                        Minimum probability value to consider a mask pixel
-                        white (default: 0.5)
-  --scale SCALE, -s SCALE
-                        Scale factor for the input images (default: 0.5)
-```
-You can specify which model file to use with `--model MODEL.pth`.
+- *mask_images: path* - путь к папке КУДА поместить маски выхода сегментации;
 
-### Training
+- *output_masked_images: path* - реконструированные томо изображения маскируются масками после сегметации и будут сохранены там,
+куда укажет этот путь.
 
-```shell script
-> python train.py -h
-usage: train.py [-h] [-e E] [-b [B]] [-l [LR]] [-f LOAD] [-s SCALE] [-v VAL]
+### Постпроцессинг:
 
-Train the UNet on images and target masks
+- *cleaning: True или False* - было сделано специально для сегментации "бабочки" в мозгу. Если True, то заливает все "дырки" и удаляет артефактные "скопления";
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -e E, --epochs E      Number of epochs (default: 5)
-  -b [B], --batch-size [B]
-                        Batch size (default: 1)
-  -l [LR], --learning-rate [LR]
-                        Learning rate (default: 0.1)
-  -f LOAD, --load LOAD  Load model from a .pth file (default: False)
-  -s SCALE, --scale SCALE
-                        Downscaling factor of the images (default: 0.5)
-  -v VAL, --validation VAL
-                        Percent of the data that is used as validation (0-100)
-                        (default: 15.0)
+- *apply_masks: True или False* - нужно ли отмаскировать исходные томо изображения масками, полученными после сегментации;
 
-```
-By default, the `scale` is 0.5, so if you wish to obtain better results (but use more memory), set it to 1.
+- *output_masked_images: path* - реконструированные томо изображения маскируются масками после сегметации (если apply_masks: True) и будут сохранены там, куда укажет этот путь.
 
-The input images and target masks should be in the `data/imgs` and `data/masks` folders respectively.
+### Классическая сегментация мелких деталей изображения. RandomWlaker:
 
-### Pretrained model
-A [pretrained model](https://github.com/milesial/Pytorch-UNet/releases/tag/v1.0) is available for the Carvana dataset. It can also be loaded from torch.hub:
+- *segment_small_features: True или False* - запустить рандомволкер, если True;
 
-```python
-net = torch.hub.load('milesial/Pytorch-UNet', 'unet_carvana')
-```
-The training was done with a 100% scale and bilinear upsampling.
+- *RandomWalker_mask_folder: "neurons_binary_mask"* - куда сохранять бинарные маски выхода RandomWlaker;
 
-## Tensorboard
-You can visualize in real time the train and test losses, the weights and gradients, along with the model predictions with tensorboard:
+- *z_ranges: [[0, 560], [550, 1_110], [1_100, 1_660], [1_650, 2120]]* - как декомпозировать вычисления по вертикали для оптимизации.
+Запустить RandomWlaker на всем и сразу вред ли получится (памяти надо много), но лишь по нескольким томографическим слоям - возможно. По умолчанию - сначала обрабатываем томо сечения от 0 по 560, потом 550-1110 (немного с перекрытием) и т.д. до 2120.
 
-`tensorboard --logdir=runs`
+- *apply_boundary_mask: True или False* - не дать RandomWlaker выходить за края отсегментированного нейронкой изображения;
 
-You can find a reference training run with the Caravana dataset on [TensorBoard.dev](https://tensorboard.dev/experiment/1m1Ql50MSJixCbG1m9EcDQ/#scalars&_smoothingWeight=0.6) (only scalars are shown currently).
+- *separate_small_features: True или False* - разделить ли отсегментированные детали на крупные и малые;
 
-## Notes on memory
-
-The model has be trained from scratch on a GTX970M 3GB.
-Predicting images of 1918*1280 takes 1.5GB of memory.
-Training takes much approximately 3GB, so if you are a few MB shy of memory, consider turning off all graphical displays.
-This assumes you use bilinear up-sampling, and not transposed convolution in the model.
-
-## Support
-
-Personalized support for issues with this repository, or integrating with your own dataset, available on [xs:code](https://xscode.com/milesial/Pytorch-UNet).
-
-
----
-
-Original paper by Olaf Ronneberger, Philipp Fischer, Thomas Brox: [https://arxiv.org/abs/1505.04597](https://arxiv.org/abs/1505.04597)
-
-![network architecture](https://i.imgur.com/jeDVpqF.png)
+- *threshold_cluster_size: 7000* - порог разделения (количество вокселей в 3д объеме) деталей на крупные и малые.
