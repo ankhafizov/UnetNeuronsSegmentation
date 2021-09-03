@@ -27,11 +27,16 @@ def binarize_img(im, thrs1, thrs2, max_iter):
         return np.zeros_like(im)
     t = random_walker(im, markers, beta=100)
     print("count", count, " of ", max_iter, f" %: {count/max_iter:.2f}" ,"| time (min): ", (time.time() - start_time) / 60)
+    bin_img_part = (t<2).astype(int)
 
-    return (t<2).astype(int)
+    materiality = bin_img_part.sum() / bin_img_part.size
+    if materiality > 0.99:
+        return np.zeros_like(im)
+    else:
+        return bin_img_part
 
 
-def segment_neurons(mask_folder_name, z_range,
+def segment_small_features(mask_folder_name, z_range,
                     thrs1 = 0.000266, thrs2 = -1.54e-05,
                     boundary_mask_folder = None):
 
@@ -62,9 +67,10 @@ def segment_neurons(mask_folder_name, z_range,
             dm.save_tif(img_2d_bin, shot_name, save_folder)
     else:
         bound_mask_3d, _ =  dm.assemble_3d_img_stack(boundary_mask_folder,
-                                                z_range)
-        for img_2d_bin, shot_name in tqdm(zip(image_3d, tomo_section_filenames)):
-            img_2d_bin = np.logical_and(img_2d_bin, bound_mask_3d)
+                                                     z_range)
+        for img_2d_bin, bmask, shot_name in tqdm(zip(image_3d, bound_mask_3d,
+                                                     tomo_section_filenames)):
+            img_2d_bin = img_2d_bin * bmask
             dm.save_tif(img_2d_bin , shot_name, save_folder)
     
     global count
