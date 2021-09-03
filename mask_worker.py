@@ -89,30 +89,37 @@ def apply_mask_CNN(smooth=False):
 
 
 def vizualize_mask_RandomWalker(section_number, separate_small_and_big=True):
-    tomo_img = _get_section_img(OUTPUT_MASKED_IMAGES_FOLDER, section_number)
 
     rw_mask_folder = config_helper.get_RandomWalker_mask_img_folder()
 
-    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(20, 20))
+    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(30, 10))
 
-    tomo_img = exposure.equalize_adapthist(tomo_img,
-                                           clip_limit=0.02)
+    tomo_img = _get_section_img(INPUT_TOMO_IMAGES_FOLDER, section_number)
     axes[0].imshow(tomo_img, cmap="gray")
-    axes[1].imshow(tomo_img, cmap="gray")
+
+    tomo_img_masked = _get_section_img(OUTPUT_MASKED_IMAGES_FOLDER,
+                                       section_number)
+    tomo_img_masked = exposure.equalize_adapthist(tomo_img_masked,
+                                           clip_limit=0.02)
+    axes[1].imshow(tomo_img_masked, cmap="gray")
+    axes[2].imshow(tomo_img_masked, cmap="gray")
     if separate_small_and_big:
         try:
             big_mask = _get_section_img(rw_mask_folder + "_big", section_number)
-            axes[1].contour(big_mask, colors="yellow")
+            axes[2].contour(big_mask, colors="yellow")
         except FileNotFoundError:
             pass
         try:
             small_mask = _get_section_img(rw_mask_folder + "_small", section_number)
-            axes[1].contour(small_mask, colors="red")
+            axes[2].contour(small_mask, colors="red")
         except FileNotFoundError:
             pass
     else:
         mask = _get_section_img(rw_mask_folder, section_number)
-        axes[1].contour(mask, colors="red")
+        axes[2].contour(mask, colors="red")
+
+    for ax in axes:
+        ax.axis("off")
 
     if DEVICE=="server":
         dm.save_fig(fig, "mask_RW")
@@ -123,7 +130,7 @@ def vizualize_mask_RandomWalker(section_number, separate_small_and_big=True):
 
 
 if __name__ == "__main__":
-    section_number = 2100
+    section_number = 2000
     vizualize_mask_RandomWalker(section_number)
     # vizualize_mask_3d(mask_only=False)    # m = _smooth_mask()
     # fig, ax = plt.subplots(figsize=(10, 10))
