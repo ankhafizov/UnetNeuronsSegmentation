@@ -89,6 +89,9 @@ def apply_mask_CNN(smooth=False):
 
 
 def vizualize_mask_RandomWalker(section_number, separate_small_and_big=True):
+    """
+    Показать бинаризацию выполненную спомощью RandomWalker
+    """
 
     rw_mask_folder = config_helper.get_RandomWalker_mask_img_folder()
 
