@@ -19,3 +19,4 @@ venv_neuron_segmentation
 
 .vscode
 *.json
+*.zip
