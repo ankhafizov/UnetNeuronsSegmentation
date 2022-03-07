@@ -8,9 +8,11 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
+from PIL import Image
+
 from tqdm import tqdm
 
-def labelme2images(input_dir, output_dir):
+def labelme2images(input_dir, output_dir, extention):
     
     print("Generating dataset")
     
@@ -25,9 +27,10 @@ def labelme2images(input_dir, output_dir):
             mask = np.zeros((h, w), dtype=np.uint8)
             for shape in shapes:
                 mask += shape_to_mask((h, w), shape['points'], shape_type=None,line_width=1, point_size=1)
-            output_filename = osp.join(output_dir, osp.basename(filename).replace(".json", ".png"))
-            plt.imsave(output_filename, mask>0)
+            output_filename = osp.join(output_dir, osp.basename(filename).replace(".json", extention))
+            im = Image.fromarray(mask > 0)
+            im.save(output_filename)
 
 
 if __name__ =="__main__":
-    labelme2images("data\\masks_json", "data\\masks_png")
+    labelme2images("data\\masks_json", "data\\masks", extention=".tif")
