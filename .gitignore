@@ -16,3 +16,6 @@ venv_neuron_segmentation
 
 *png
 *tif
+
+.vscode
+*.json
