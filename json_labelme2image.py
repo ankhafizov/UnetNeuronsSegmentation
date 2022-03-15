@@ -6,12 +6,9 @@ import cv2
 import glob
 import numpy as np
 
-import matplotlib.pyplot as plt
-
-from PIL import Image
-
 from tqdm import tqdm
 
+normalize = lambda x: ((x - x.min()) / (x.max() - x.min()) * 255).astype(int)
 def labelme2images(input_dir, output_dir, extention):
     
     print("Generating dataset")
@@ -28,9 +25,8 @@ def labelme2images(input_dir, output_dir, extention):
             for shape in shapes:
                 mask += shape_to_mask((h, w), shape['points'], shape_type=None,line_width=1, point_size=1)
             output_filename = osp.join(output_dir, osp.basename(filename).replace(".json", extention))
-            im = Image.fromarray(mask > 0)
-            im.save(output_filename)
+            cv2.imwrite(output_filename, normalize((mask > 0).astype(int)))
 
 
 if __name__ =="__main__":
-    labelme2images("data\\masks_json", "data\\masks", extention=".tif")
+    labelme2images("data/masks_json", "data/masks", extention=".tif")
