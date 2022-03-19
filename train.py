@@ -6,6 +6,7 @@ import sys
 import numpy as np
 import torch
 import torch.nn as nn
+from utils import losses
 from torch import optim
 from tqdm import tqdm
 
@@ -56,7 +57,7 @@ def train_net(net,
     if net.n_classes > 1:
         criterion = nn.CrossEntropyLoss()
     else:
-        criterion = nn.BCEWithLogitsLoss()
+        criterion = losses.DiceLoss()
 
     for epoch in range(epochs):
         net.train()
