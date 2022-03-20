@@ -60,7 +60,7 @@ if __name__=="__main__":
             rws.segment_small_features(MASKED_IMAGES_FOLDER, z_range,
                                 thrs1 = 0.000266, thrs2 = -1.54e-05,
                                 boundary_mask_folder = boundary_mask_folder)
-    if config_helper.open_config()["separate_small_features"]:
-        threshold_cluster_size = \
-            config_helper.open_config()["threshold_cluster_size"]
-        cluster_worker.separate_clusters_by_size(threshold_cluster_size)
+        if config_helper.open_config()["separate_small_features"]:
+            threshold_cluster_size = \
+                config_helper.open_config()["threshold_cluster_size"]
+            cluster_worker.separate_clusters_by_size(threshold_cluster_size)
