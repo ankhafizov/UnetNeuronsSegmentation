@@ -33,7 +33,7 @@ def load_all_data(folder_name):
     filenames = sorted(os.listdir(folder_name))
 
     for fn in filenames:
-        yield get_tif_img2d(fn, folder_name), fn[0:4]
+        yield get_tif_img2d(fn, folder_name), "".join(fn.split(".")[:-1])
 
 
 def assemble_3d_img(folder_name):
