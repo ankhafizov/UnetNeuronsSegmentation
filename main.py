@@ -20,7 +20,10 @@ PYTHONPATH = "python"
 
 def train():
     scale = config_helper.open_config()["scale_img"]
-    os.system(f"{PYTHONPATH} train.py -s {scale}")
+    batch_size = config_helper.open_config()["batch_size"]
+    learning_rate = config_helper.open_config()["learning_rate"]
+
+    os.system(f"{PYTHONPATH} train.py -s {scale} --batch-size {batch_size} --learning-rate {learning_rate}")
     os.replace("checkpoints/CP_epoch5.pth", MODEL_NAME)
 
 
