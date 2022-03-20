@@ -22,8 +22,9 @@ def train(config):
     scale = config["scale_img"]
     batch_size = config["batch_size"]
     learning_rate = config["learning_rate"]
+    epochs = config["epochs"]
 
-    os.system(f"{PYTHONPATH} train.py -s {scale} --batch-size {batch_size} --learning-rate {learning_rate}")
+    os.system(f"{PYTHONPATH} train.py -s {scale} --batch-size {batch_size} --learning-rate {learning_rate} --epochs {epochs}")
     os.replace("checkpoints/CP_epoch5.pth", MODEL_NAME)
 
 
