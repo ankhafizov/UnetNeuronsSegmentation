@@ -5,11 +5,12 @@ import os.path as osp
 import cv2
 import glob
 import numpy as np
+from scipy.ndimage import binary_fill_holes
 
 from tqdm import tqdm
 
 normalize = lambda x: ((x - x.min()) / (x.max() - x.min()) * 255).astype(int)
-def labelme2images(input_dir, output_dir, extention):
+def labelme2images(input_dir, output_dir, extention, fill_holes):
     
     print("Generating dataset")
     
@@ -24,9 +25,12 @@ def labelme2images(input_dir, output_dir, extention):
             mask = np.zeros((h, w), dtype=np.uint8)
             for shape in shapes:
                 mask += shape_to_mask((h, w), shape['points'], shape_type=None,line_width=1, point_size=1)
+
+            if fill_holes:
+                mask = binary_fill_holes(mask)
             output_filename = osp.join(output_dir, osp.basename(filename).replace(".json", extention))
             cv2.imwrite(output_filename, normalize((mask > 0).astype(int)))
 
 
 if __name__ =="__main__":
-    labelme2images("data/masks_json", "data/masks", extention=".tif")
+    labelme2images("data/masks_json", "data/masks", extention=".tif", fill_holes=True)
