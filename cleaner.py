@@ -23,8 +23,6 @@ def remove_small_elements(bin_img, count_of_large_elements):
     indexes = np.argsort(cluster_sizes)
     cluster_labels, cluster_sizes = cluster_labels[indexes], cluster_sizes[indexes]
     relevant_class_labels = cluster_labels[-count_of_large_elements:]
-    print(labeled_mask)
-
     mask = np.zeros(labeled_mask.shape, dtype=int)
     for label in relevant_class_labels:
         mask += (labeled_mask == label)
