@@ -25,7 +25,7 @@ def train(config):
     epochs = config["epochs"]
 
     os.system(f"{PYTHONPATH} train.py -s {scale} --batch-size {batch_size} --learning-rate {learning_rate} --epochs {epochs}")
-    os.replace("checkpoints/CP_epoch5.pth", MODEL_NAME)
+    os.replace(f"checkpoints/CP_epoch{epochs}.pth", MODEL_NAME)
 
 
 def predict(beginning=0):
